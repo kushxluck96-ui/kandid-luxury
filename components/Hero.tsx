@@ -45,14 +45,23 @@ export default function Hero() {
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           className="relative mt-16 flex h-[380px] w-[380px] items-center justify-center"
         >
-          <Image
-  src="/images/pearl.png"
-  alt="Pearl Powder"
-  width={380}
-  height={380}
-  priority
-  className="h-auto w-full max-w-[380px] drop-shadow-[0_45px_70px_rgba(0,0,0,0.15)]"
-/>
+         <Image
+            src="/images/pearl.png"
+            alt="Kandid Pearl Powder"
+            width={380}
+            height={380}
+            priority
+            draggable={false}
+            onDragStart={(e) => e.preventDefault()}
+            className="
+              h-auto
+              w-full
+              max-w-[380px]
+              select-none
+              pointer-events-none
+              drop-shadow-[0_45px_70px_rgba(0,0,0,0.15)]
+            "
+          />
           <div className="absolute bottom-6 left-1/2 h-5 w-52 -translate-x-1/2 rounded-full bg-black/10 blur-2xl" />
         </motion.div>
 
