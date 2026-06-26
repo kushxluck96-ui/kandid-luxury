@@ -32,11 +32,12 @@ export default function About() {
             <div className="mt-8 h-px w-16 bg-neutral-300" />
 
             <p className="mt-8 max-w-2xl leading-8 text-neutral-600 text-lg">
-              Experience the beauty secrets of nature with our 100% Natural Pearl
-              Powder, finely milled from premium-quality pearls. Rich in naturally
-              occurring minerals, amino acids, and calcium, this luxurious powder
-              helps brighten the complexion, improve skin radiance, and leave the
-              skin feeling soft and smooth.
+              Discover the timeless beauty of 100% Pure Pearl Powder — a precious mineral powder made from carefully selected pearl material, 
+              naturally rich in amino acids, minerals, and calcium. Revered for centuries in Asian beauty rituals, pearl powder is known for 
+              its luxurious skincare benefits that help enhance radiance, support a smoother-looking complexion, and nourish the skin.
+              Traditionally valued for beauty care, it has also been used to support the appearance of healthy-looking hair, nails, and whiter-looking
+              teeth. Pearl has long been associated with purity, calmness, and feminine elegance — bringing a sense of harmony and timeless beauty to your self-care ritual.
+              A pure, elegant ingredient inspired by nature’s own beauty.
             </p>
 
             <p className="mt-4 max-w-2xl leading-8 text-neutral-600 text-lg">
