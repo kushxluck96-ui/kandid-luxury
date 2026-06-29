@@ -12,10 +12,11 @@ export default function Home() {
     <main className="bg-[#F8F8F6]">
 
       <Hero />
-      <PearlArt />
+     
       <HowToApply />
       <Benefits />
       <About />
+      <PearlArt />s
 
       
 
