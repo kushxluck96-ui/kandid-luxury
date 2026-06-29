@@ -4,7 +4,8 @@ import About from "@/components/About";
 
 import HowToApply from "@/components/HowToApply";
 import Benefits from "@/components/Benefits";
-import PearlArt from "@/components/PearlArt";
+
+import Footer from "@/components/Footer";
 
 
 export default function Home() {
@@ -16,8 +17,8 @@ export default function Home() {
       <HowToApply />
       <Benefits />
       <About />
-      <PearlArt />s
-
+      
+      <Footer/>
       
 
     </main>
