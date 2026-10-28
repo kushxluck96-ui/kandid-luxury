@@ -41,7 +41,6 @@ const structuredData = {
   ],
 };
 
-
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#F8F8F6]">
@@ -52,27 +51,32 @@ export default function Home() {
         }}
       />
 
-      
-<header className="fixed left-1/2 top-4 z-50 flex w-[calc(100%-2rem)] max-w-7xl -translate-x-1/2 items-center justify-end gap-3 rounded-full border border-[#D8D0BE]/70 bg-[#F8F8F6]/90 px-4 py-3 shadow-[0_8px_30px_rgba(41,40,32,0.08)] backdrop-blur-xl sm:top-6 sm:w-[calc(100%-3rem)] sm:px-6">
-  <Link
-    href="/account/login"
-    className="rounded-full px-4 py-2 text-sm tracking-wide text-[#514A3D] transition hover:text-[#9A8153]"
-  >
-    Login
-  </Link>
+      <header className="mx-auto flex max-w-7xl items-center justify-end gap-3 px-5 py-5 sm:px-8">
+        <Link
+          href="/account/login"
+          aria-label="Login to your account"
+          className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm tracking-wide text-[#514A3D] transition hover:bg-[#EFEEE8]"
+        >
+          <UserRound size={16} strokeWidth={1.5} />
+          Login
+        </Link>
 
-  <Link
-    href="/shop"
-    aria-label="Shop skincare"
-    className="inline-flex items-center gap-2 rounded-full border border-[#B8A47A]/70 bg-[#292820] px-5 py-2.5 text-sm tracking-wide text-[#F8F5ED] transition duration-300 hover:bg-[#403D31]"
-  >
-    <ShoppingBag size={17} strokeWidth={1.5} />
-    <span>Shop</span>
-  </Link>
-</header>
-
+        <Link
+          href="/shop"
+          className="group inline-flex items-center gap-2.5 rounded-full border border-[#B8A47A] bg-[#292820] px-5 py-3 text-sm tracking-wide text-[#F8F5ED] shadow-sm transition duration-300 hover:border-[#D5C29A] hover:bg-[#403D31]"
+        >
+          <ShoppingBag
+            size={17}
+            strokeWidth={1.5}
+            className="transition-transform duration-300 group-hover:-translate-y-0.5"
+          />
+          <span>Shop Now</span>
+        </Link>
+      </header>
 
       <Hero />
+
+      
       <HowToApply />
       <Benefits />
       <About />
