@@ -31,12 +31,12 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
           className="mt-4 text-center"
         >
-          <h1 className="font-serif text-5xl italic font-light text-neutral-800 md:text-6xl">
+          <p className="font-serif text-5xl italic font-light text-neutral-800 md:text-6xl">
             I am
+          </p>
+          <h1 className="mt-1 font-serif text-7xl italic font-light leading-none text-black md:text-8xl">
+            100% Pure 
           </h1>
-          <h2 className="mt-1 font-serif text-7xl italic font-light leading-none text-black md:text-8xl">
-            100% Pure
-          </h2>
         </motion.div>
 
         {/* Floating Product */}
@@ -72,9 +72,7 @@ export default function Hero() {
           transition={{ delay: 0.5 }}
           className="-mt-8 text-center"
         >
-          <h3 className="text-4xl font-semibold tracking-tight text-black">
-            Pearl Powder
-          </h3>
+          <p className="text-4xl font-semibold tracking-tight text-black">Pearl Powder</p>
           
 
           {/* Feature Pills */}

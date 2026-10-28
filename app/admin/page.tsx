@@ -20,6 +20,12 @@ const sections = [
     icon: "🛍️",
   },
   {
+  title: "Orders",
+  description: "View customer orders and manage fulfillment",
+  href: "/admin/orders",
+  icon: "📦",
+  },
+  {
     title: "Testimonials",
     description: "Customer reviews",
     href: "/admin/testimonials",

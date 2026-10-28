@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { CartProvider } from "@/components/CartProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,23 +17,25 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://kandidluxury.com"),
 
   title: {
-    default: "Kandid Luxury",
+    default: "100% Pure Pearl Powder for Skin | Kandid Luxury",
     template: "%s | Kandid Luxury",
   },
 
   description:
-    "Discover Kandid Luxury's premium 100% Pure Pearl Powder for radiant, healthy, and glowing skin. Luxury skincare crafted for beauty enthusiasts.",
+    "Discover Kandid Luxury's 100% pure pearl powder for a refined skincare ritual and naturally luminous-looking skin.",
+
+  alternates: {
+    canonical: "/",
+  },
 
   keywords: [
     "Kandid Luxury",
     "Pearl Powder",
     "Pure Pearl Powder",
-    "Luxury Skincare",
-    "Beauty Products",
-    "Skin Care Nepal",
-    "Cosmetics Nepal",
-    "Glowing Skin",
-    "Natural Beauty",
+    "pearl powder for face",
+    "pearl powder skincare",
+    "natural skincare",
+    "luxury skincare Nepal",
   ],
 
   authors: [
@@ -45,29 +48,20 @@ export const metadata: Metadata = {
   publisher: "Kandid Luxury",
 
   openGraph: {
-    title: "Kandid Luxury",
+    title: "100% Pure Pearl Powder for Skin | Kandid Luxury",
     description:
-      "Premium 100% Pure Pearl Powder for radiant, healthy, and glowing skin.",
+      "A refined pearl powder skincare ritual for luminous-looking skin.",
     url: "https://kandidluxury.com",
     siteName: "Kandid Luxury",
     locale: "en_US",
     type: "website",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Kandid Luxury",
-      },
-    ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Kandid Luxury",
+    title: "100% Pure Pearl Powder for Skin | Kandid Luxury",
     description:
-      "Premium 100% Pure Pearl Powder for radiant, healthy skin.",
-    images: ["/og-image.jpg"],
+      "A refined pearl powder skincare ritual for luminous-looking skin.",
   },
 
   icons: {
@@ -79,6 +73,13 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 
@@ -92,7 +93,11 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+  <CartProvider>
+    {children}
+  </CartProvider>
+</body>
     </html>
   );
 }

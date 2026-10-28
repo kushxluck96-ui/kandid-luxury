@@ -8,39 +8,39 @@ const benefits = [
 
      {
     number: "01",
-    title: "Brightens Complexion",
+    title: "A Luminous-Looking Finish",
     description:
-      "Pearl powder contains nacre and amino acids that naturally illuminate skin, reducing dullness and promoting a luminous, even-toned glow.",
+      "Use pearl powder as part of a carefully prepared skincare ritual for a soft, radiant-looking finish.",
   },
   {
     number: "02",
-    title: "Deep Hydration",
+    title: "A Refined Ritual",
     description:
-      "Rich in calcium and trace minerals, it strengthens the skin barrier and helps lock in moisture for long-lasting softness.",
+      "Blend a small amount into your preferred mask base to create a smooth, sensory application experience.",
   },
   {
     number: "03",
-    title: "Anti-Aging",
+    title: "Timeless Inspiration",
     description:
-      "Naturally occurring conchiolin protein stimulates collagen production, visibly reducing fine lines and improving skin elasticity over time.",
+      "Pearl has a long history in beauty traditions, reimagined here for a modern, considered routine.",
   },
   {
     number: "04",
-    title: "Calms & Soothes",
+    title: "Made for Custom Rituals",
     description:
-      "Pearl's cooling properties reduce redness and irritation, making it ideal for sensitive or reactive skin types.",
+      "Choose a mask base that suits your personal routine and follow with your usual skincare products.",
   },
   {
     number: "05",
-    title: "Detoxifies Skin",
+    title: "Pure, Simple Ingredient",
     description:
-      "Acts as a gentle detoxifier, drawing out impurities and excess sebum while leaving the skin clean and refreshed.",
+      "100% pure pearl powder gives you a versatile ingredient for your at-home beauty ritual.",
   },
   {
     number: "06",
-    title: "Enhances Radiance",
+    title: "A Touch of Luxury",
     description:
-      "Regular use imparts a soft-focus, lit-from-within radiance — the signature of pearl-infused skincare traditions.",
+      "Turn everyday self-care into a moment of calm with a thoughtfully crafted pearl powder application.",
   },
   // ... same as before
 ];
