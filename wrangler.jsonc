@@ -11,6 +11,7 @@
     "enabled": true
   },
   "routes": [
-    { "pattern": "www.kandidluxury.com", "custom_domain": true }
-  ]
+  { "pattern": "kandidluxury.com", "custom_domain": true },
+  { "pattern": "www.kandidluxury.com", "custom_domain": true }
+]
 }
