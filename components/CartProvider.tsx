@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -7,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 export type CartItem = {
   id: string;
@@ -33,28 +35,106 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
-  // Load cart
+  // Load the saved cart, then refresh prices from Supabase.
   useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem("kandid-cart");
+    let cancelled = false;
 
-      if (savedCart) {
-        setItems(JSON.parse(savedCart));
+    async function loadCart() {
+      let savedItems: CartItem[] = [];
+
+      try {
+        const savedCart = localStorage.getItem("kandid-cart");
+
+        if (savedCart) {
+          const parsed: unknown = JSON.parse(savedCart);
+
+          if (Array.isArray(parsed)) {
+            savedItems = parsed.filter(
+              (item): item is CartItem =>
+                item !== null &&
+                typeof item === "object" &&
+                typeof item.id === "string" &&
+                typeof item.quantity === "number" &&
+                Number.isInteger(item.quantity) &&
+                item.quantity > 0
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load cart:", error);
       }
-    } catch (error) {
-      console.error("Failed to load cart:", error);
+
+      if (cancelled) return;
+
+      setItems(savedItems);
+      setLoaded(true);
+
+      if (savedItems.length === 0) return;
+
+      try {
+        const ids = [...new Set(savedItems.map((item) => item.id))];
+
+        const { data, error } = await supabase
+          .from("products")
+          .select(
+            "id, slug, name, price, original_price, weight, image_url, is_active"
+          )
+          .in("id", ids);
+
+        if (error) {
+          console.error("Failed to refresh cart prices:", error);
+          return;
+        }
+
+        if (cancelled || !data) return;
+
+        const productsById = new Map(data.map((product) => [product.id, product]));
+
+        setItems((currentItems) =>
+          currentItems.map((item) => {
+            const product = productsById.get(item.id);
+
+            // Keep unavailable items visible so customers can review their bag.
+            if (!product || !product.is_active) return item;
+
+            return {
+              ...item,
+              slug: product.slug,
+              name: product.name,
+              price: Number(product.price),
+              original_price:
+                product.original_price == null
+                  ? null
+                  : Number(product.original_price),
+              weight: product.weight,
+              image_url: product.image_url,
+            };
+          })
+        );
+      } catch (error) {
+        console.error("Failed to refresh cart prices:", error);
+      }
     }
+
+    void loadCart();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Save cart
+  // Save only after the initial cart has loaded.
   useEffect(() => {
+    if (!loaded) return;
+
     try {
       localStorage.setItem("kandid-cart", JSON.stringify(items));
     } catch (error) {
       console.error("Failed to save cart:", error);
     }
-  }, [items]);
+  }, [items, loaded]);
 
   function addToCart(item: CartItem) {
     setItems((currentItems) => {
@@ -67,7 +147,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
           cartItem.id === item.id
             ? {
                 ...cartItem,
-                quantity: cartItem.quantity + 1,
+                price: item.price,
+                original_price: item.original_price,
+                name: item.name,
+                slug: item.slug,
+                weight: item.weight,
+                image_url: item.image_url,
+                quantity: cartItem.quantity + item.quantity,
               }
             : cartItem
         );
@@ -91,12 +177,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     setItems((currentItems) =>
       currentItems.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              quantity,
-            }
-          : item
+        item.id === id ? { ...item, quantity } : item
       )
     );
   }
