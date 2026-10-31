@@ -2,16 +2,14 @@
 import Link from "next/link";
 import { ShoppingBag, UserRound } from "lucide-react";
 import Hero from "@/components/Hero";
-import About from "@/components/About";
-import HowToApply from "@/components/HowToApply";
-import Benefits from "@/components/Benefits";
 import Footer from "@/components/Footer";
+import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "100% Pure Pearl Powder for Skin",
+  title: "MiniMagic Skincare by Kandid Luxury",
   description:
-    "Discover Kandid Luxury's 100% pure pearl powder for a refined skincare ritual and naturally luminous-looking skin.",
+    "Little Magic. Beautiful Skin. Everyday Confidence. Discover MiniMagic skincare by Kandid Luxury.",
   alternates: {
     canonical: "/",
   },
@@ -27,21 +25,27 @@ const structuredData = {
       logo: "https://kandidluxury.com/favicon.ico",
     },
     {
-      "@type": "Product",
-      name: "Kandid Pearl Powder",
-      description:
-        "100% pure pearl powder for a refined skincare ritual and luminous-looking skin.",
-      image: "https://kandidluxury.com/images/pearl.png",
-      brand: {
-        "@type": "Brand",
-        name: "Kandid Luxury",
-      },
-      category: "Skincare",
+      "@type": "Brand",
+      name: "MiniMagic Skincare",
+      slogan: "Little Magic. Beautiful Skin. Everyday Confidence.",
     },
   ],
 };
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const displayName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.user_metadata?.given_name ||
+    user?.email?.split("@")[0] ||
+    "My Account";
+
   return (
     <main className="min-h-screen bg-[#F8F8F6]">
       <script
@@ -52,34 +56,37 @@ export default function Home() {
       />
 
       <header className="mx-auto flex max-w-7xl items-center justify-end gap-3 px-5 py-5 sm:px-8">
-        <Link
-          href="/account/login"
-          aria-label="Login to your account"
-          className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm tracking-wide text-[#514A3D] transition hover:bg-[#EFEEE8]"
-        >
-          <UserRound size={16} strokeWidth={1.5} />
-          Login
-        </Link>
+        {user ? (
+          <Link
+            href="/account"
+            aria-label="Open your account"
+            className="inline-flex max-w-[180px] items-center gap-2 rounded-full px-3 py-2.5 text-sm tracking-wide text-[#514A3D] transition hover:bg-[#EFEEE8]"
+          >
+            <UserRound
+              size={16}
+              strokeWidth={1.5}
+              className="shrink-0"
+            />
+            <span className="truncate">
+              {displayName}
+            </span>
+          </Link>
+        ) : (
+          <Link
+            href="/account/login"
+            aria-label="Login to your account"
+            className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm tracking-wide text-[#514A3D] transition hover:bg-[#EFEEE8]"
+          >
+            <UserRound size={16} strokeWidth={1.5} />
+            Login
+          </Link>
+        )}
 
-        <Link
-          href="/shop"
-          className="group inline-flex items-center gap-2.5 rounded-full border border-[#B8A47A] bg-[#292820] px-5 py-3 text-sm tracking-wide text-[#F8F5ED] shadow-sm transition duration-300 hover:border-[#D5C29A] hover:bg-[#403D31]"
-        >
-          <ShoppingBag
-            size={17}
-            strokeWidth={1.5}
-            className="transition-transform duration-300 group-hover:-translate-y-0.5"
-          />
-          <span>Shop Now</span>
-        </Link>
+       
       </header>
 
       <Hero />
 
-      
-      <HowToApply />
-      <Benefits />
-      <About />
       <Footer />
     </main>
   );

@@ -2,7 +2,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -29,12 +28,14 @@ export async function proxy(request: NextRequest) {
     }
   );
 
+  // Refresh and verify the user's session.
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
 
+  // Protect admin pages.
   if (pathname.startsWith("/admin")) {
     if (!user || user.email?.toLowerCase() !== "kusheazy@gmail.com") {
       const loginUrl = new URL("/login", request.url);
@@ -43,7 +44,11 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  if (pathname === "/login" && user?.email?.toLowerCase() === "kusheazy@gmail.com") {
+  // Redirect the admin away from the admin login page.
+  if (
+    pathname === "/login" &&
+    user?.email?.toLowerCase() === "kusheazy@gmail.com"
+  ) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
 
@@ -51,5 +56,14 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login"],
+  matcher: [
+    /*
+     * Run on all application pages except:
+     * - Next.js static assets
+     * - Image optimization
+     * - Favicon
+     * - Common image files
+     */
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+  ],
 };

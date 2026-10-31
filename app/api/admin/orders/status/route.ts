@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import Razorpay from "razorpay";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,8 +32,9 @@ function isValidTrackingUrl(value: string) {
 
 export async function PATCH(request: Request) {
   try {
-    // Verify the signed-in administrator.
+    // Verify administrator authentication.
     const supabase = await createClient();
+
     const {
       data: { user },
       error: authError,
@@ -54,11 +56,6 @@ export async function PATCH(request: Request) {
     const orderId =
       typeof body.orderId === "string" ? body.orderId.trim() : "";
 
-    const newStatus =
-      typeof body.orderStatus === "string"
-        ? body.orderStatus.trim()
-        : "";
-
     if (!isValidUuid(orderId)) {
       return NextResponse.json(
         { error: "Invalid order ID" },
@@ -66,14 +63,7 @@ export async function PATCH(request: Request) {
       );
     }
 
-    if (!["processing", "shipped", "delivered"].includes(newStatus)) {
-      return NextResponse.json(
-        { error: "Invalid fulfillment status" },
-        { status: 400 }
-      );
-    }
-
-    // Fetch current state before validating the transition.
+    // Retrieve the current order.
     const { data: order, error: orderError } = await supabaseAdmin
       .from("orders")
       .select("*")
@@ -82,6 +72,7 @@ export async function PATCH(request: Request) {
 
     if (orderError) {
       console.error("Order lookup failed:", orderError.message);
+
       return NextResponse.json(
         { error: "Unable to verify order" },
         { status: 500 }
@@ -92,6 +83,142 @@ export async function PATCH(request: Request) {
       return NextResponse.json(
         { error: "Order not found" },
         { status: 404 }
+      );
+    }
+
+    /*
+     * SPECIAL ADMIN ACTION:
+     * Verify payment directly with Razorpay and confirm the order.
+     */
+    if (body.action === "verify_and_confirm") {
+      if (order.order_status !== "payment_review") {
+        return NextResponse.json(
+          {
+            error:
+              "This order is no longer in payment review. Refresh the orders page.",
+          },
+          { status: 409 }
+        );
+      }
+
+      if (!order.payment_id || !order.payment_order_id) {
+        return NextResponse.json(
+          {
+            error:
+              "Payment ID or Razorpay order ID is missing. Cannot verify this payment.",
+          },
+          { status: 400 }
+        );
+      }
+
+      const keyId = process.env.RAZORPAY_KEY_ID;
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+      if (!keyId || !keySecret) {
+        return NextResponse.json(
+          {
+            error: "Razorpay verification is not configured on the server.",
+          },
+          { status: 503 }
+        );
+      }
+
+      const razorpay = new Razorpay({
+        key_id: keyId,
+        key_secret: keySecret,
+      });
+
+      // Independently retrieve the payment from Razorpay.
+      const payment = await razorpay.payments.fetch(order.payment_id);
+
+      const expectedAmount = Math.round(Number(order.total) * 100);
+      const refundedAmount = Number(payment.amount_refunded ?? 0);
+
+      if (payment.order_id !== order.payment_order_id) {
+        return NextResponse.json(
+          {
+            error:
+              "Razorpay payment belongs to a different order. Order was not confirmed.",
+          },
+          { status: 409 }
+        );
+      }
+
+      if (
+        payment.status !== "captured" ||
+        Number(payment.amount) !== expectedAmount ||
+        payment.currency !== "INR" ||
+        refundedAmount > 0
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Razorpay could not verify a fully captured, non-refunded payment for the exact order amount. Order was not confirmed.",
+          },
+          { status: 409 }
+        );
+      }
+
+      // Confirm only if the order is still in payment_review.
+      // Payment status is updated from Razorpay's verified result.
+      const { data: updatedOrder, error: updateError } =
+        await supabaseAdmin
+          .from("orders")
+          .update({
+            payment_status: "paid",
+            order_status: "confirmed",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", orderId)
+          .eq("order_status", "payment_review")
+          .eq("payment_status", order.payment_status)
+          .select(
+            "id, order_status, payment_status, payment_id, payment_order_id, updated_at"
+          )
+          .maybeSingle();
+
+      if (updateError) {
+        console.error(
+          "Payment review confirmation failed:",
+          updateError.message
+        );
+
+        return NextResponse.json(
+          {
+            error:
+              "Razorpay verified the payment, but the order update failed. Do not ask the customer to pay again. Refresh and check the order.",
+          },
+          { status: 500 }
+        );
+      }
+
+      if (!updatedOrder) {
+        return NextResponse.json(
+          {
+            error:
+              "The order changed during verification. Refresh the page and check its current status.",
+          },
+          { status: 409 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Razorpay payment verified. Order confirmed successfully.",
+        order: updatedOrder,
+      });
+    }
+
+    // NORMAL FULFILLMENT STATUS UPDATE.
+    const newStatus =
+      typeof body.orderStatus === "string"
+        ? body.orderStatus.trim()
+        : "";
+
+    if (!["processing", "shipped", "delivered"].includes(newStatus)) {
+      return NextResponse.json(
+        { error: "Invalid fulfillment status" },
+        { status: 400 }
       );
     }
 
@@ -163,8 +290,6 @@ export async function PATCH(request: Request) {
       update.delivered_at = new Date().toISOString();
     }
 
-    // Update only fulfillment/tracking fields, never payment status.
-    // Conditions prevent overwriting a concurrent status change.
     const { data: updatedOrder, error: updateError } =
       await supabaseAdmin
         .from("orders")
@@ -179,6 +304,7 @@ export async function PATCH(request: Request) {
 
     if (updateError) {
       console.error("Order status update failed:", updateError.message);
+
       return NextResponse.json(
         { error: "Unable to update order status" },
         { status: 500 }
@@ -200,7 +326,12 @@ export async function PATCH(request: Request) {
     console.error("Admin order status API failed:", error);
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Internal server error",
+      },
       { status: 500 }
     );
   }

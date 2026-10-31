@@ -43,6 +43,27 @@ type Order = {
   items: OrderItem[];
 };
 
+type Filter =
+  | "all"
+  | "paid"
+  | "to_ship"
+  | "payment_review"
+  | "confirmed"
+  | "processing"
+  | "shipped"
+  | "delivered";
+
+const filters: { label: string; value: Filter }[] = [
+  { label: "All Orders", value: "all" },
+  { label: "Paid", value: "paid" },
+  { label: "To Ship", value: "to_ship" },
+  { label: "Payment Review", value: "payment_review" },
+  { label: "Confirmed", value: "confirmed" },
+  { label: "Processing", value: "processing" },
+  { label: "Shipped", value: "shipped" },
+  { label: "Delivered", value: "delivered" },
+];
+
 function money(value: number | null | undefined) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -67,11 +88,15 @@ function statusClass(status: string | null) {
     return "bg-green-100 text-black";
   }
 
-  if (["pending", "processing", "shipped"].includes(value)) {
+  if (
+    ["pending", "processing", "shipped", "payment_review"].includes(value)
+  ) {
     return "bg-amber-100 text-black";
   }
 
-  if (["failed", "cancelled", "canceled", "refunded", "expired"].includes(value)) {
+  if (
+    ["failed", "cancelled", "canceled", "refunded", "expired"].includes(value)
+  ) {
     return "bg-red-100 text-black";
   }
 
@@ -81,13 +106,28 @@ function statusClass(status: string | null) {
 const inputClass =
   "mt-1 w-full rounded-xl border border-neutral-400 bg-white px-3 py-3 text-sm text-black outline-none focus:border-black focus:ring-1 focus:ring-black";
 
+function isPaid(order: Order) {
+  return (order.payment_status ?? "").toLowerCase() === "paid";
+}
+
+function isToShip(order: Order) {
+  const status = (order.order_status ?? "").toLowerCase();
+
+  return (
+    isPaid(order) &&
+    ["confirmed", "processing"].includes(status)
+  );
+}
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<Filter>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [verifyingOrderId, setVerifyingOrderId] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState("");
   const [statusError, setStatusError] = useState("");
 
@@ -125,6 +165,48 @@ export default function AdminOrdersPage() {
   useEffect(() => {
     void loadOrders();
   }, [loadOrders]);
+
+  const verifyAndConfirmPayment = async (orderId: string) => {
+    const confirmed = window.confirm(
+      "Verify this payment directly with Razorpay and confirm the order?"
+    );
+
+    if (!confirmed) return;
+
+    setVerifyingOrderId(orderId);
+    setStatusMessage("");
+    setStatusError("");
+
+    try {
+      const response = await fetch("/api/admin/orders/status", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId,
+          action: "verify_and_confirm",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Payment verification failed.");
+      }
+
+      setStatusMessage(
+        data.message || "Payment verified and order confirmed."
+      );
+
+      await loadOrders();
+      setExpandedId(orderId);
+    } catch (err) {
+      setStatusError(
+        err instanceof Error ? err.message : "Unable to verify payment."
+      );
+    } finally {
+      setVerifyingOrderId(null);
+    }
+  };
 
   const updateOrderStatus = async (
     orderId: string,
@@ -201,12 +283,58 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const counts = useMemo(() => {
+    return {
+      all: orders.length,
+      paid: orders.filter(isPaid).length,
+      to_ship: orders.filter(isToShip).length,
+      payment_review: orders.filter(
+        (o) => (o.order_status ?? "").toLowerCase() === "payment_review"
+      ).length,
+      confirmed: orders.filter(
+        (o) => (o.order_status ?? "").toLowerCase() === "confirmed"
+      ).length,
+      processing: orders.filter(
+        (o) => (o.order_status ?? "").toLowerCase() === "processing"
+      ).length,
+      shipped: orders.filter(
+        (o) => (o.order_status ?? "").toLowerCase() === "shipped"
+      ).length,
+      delivered: orders.filter(
+        (o) => (o.order_status ?? "").toLowerCase() === "delivered"
+      ).length,
+    };
+  }, [orders]);
+
+  const pendingCount = orders.filter((order) =>
+    ["pending", "created", "awaiting_payment"].includes(
+      (order.payment_status ?? "").toLowerCase()
+    )
+  ).length;
+
+  const revenue = orders
+    .filter(isPaid)
+    .reduce((sum, order) => sum + Number(order.total ?? 0), 0);
+
   const filteredOrders = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    if (!query) return orders;
-
     return orders.filter((order) => {
+      const orderStatus = (order.order_status ?? "").toLowerCase();
+
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "paid" && isPaid(order)) ||
+        (filter === "to_ship" && isToShip(order)) ||
+        (filter === "payment_review" && orderStatus === "payment_review") ||
+        (filter === "confirmed" && orderStatus === "confirmed") ||
+        (filter === "processing" && orderStatus === "processing") ||
+        (filter === "shipped" && orderStatus === "shipped") ||
+        (filter === "delivered" && orderStatus === "delivered");
+
+      if (!matchesFilter) return false;
+      if (!query) return true;
+
       const searchable = [
         order.id,
         order.customer_name,
@@ -223,21 +351,7 @@ export default function AdminOrdersPage() {
 
       return searchable.includes(query);
     });
-  }, [orders, search]);
-
-  const paidCount = orders.filter(
-    (order) => (order.payment_status ?? "").toLowerCase() === "paid"
-  ).length;
-
-  const pendingCount = orders.filter((order) =>
-    ["pending", "created", "awaiting_payment"].includes(
-      (order.payment_status ?? "").toLowerCase()
-    )
-  ).length;
-
-  const revenue = orders
-    .filter((order) => (order.payment_status ?? "").toLowerCase() === "paid")
-    .reduce((sum, order) => sum + Number(order.total ?? 0), 0);
+  }, [orders, search, filter]);
 
   return (
     <main className="space-y-8 text-black">
@@ -264,7 +378,7 @@ export default function AdminOrdersPage() {
         </button>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-neutral-300 bg-white p-5">
           <p className="text-sm font-medium text-black">Orders loaded</p>
           <p className="mt-2 text-3xl font-bold text-black">{orders.length}</p>
@@ -273,20 +387,34 @@ export default function AdminOrdersPage() {
 
         <div className="rounded-2xl border border-neutral-300 bg-white p-5">
           <p className="text-sm font-medium text-black">Paid orders</p>
-          <p className="mt-2 text-3xl font-bold text-black">{paidCount}</p>
+          <p className="mt-2 text-3xl font-bold text-black">{counts.paid}</p>
         </div>
 
         <div className="rounded-2xl border border-neutral-300 bg-white p-5">
-          <p className="text-sm font-medium text-black">Revenue from paid orders</p>
-          <p className="mt-2 text-3xl font-bold text-black">{money(revenue)}</p>
-          <p className="mt-1 text-xs text-neutral-800">Based on loaded orders</p>
+          <p className="text-sm font-medium text-black">To ship</p>
+          <p className="mt-2 text-3xl font-bold text-black">{counts.to_ship}</p>
+          <p className="mt-1 text-xs text-neutral-800">
+            Paid and awaiting dispatch
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-neutral-300 bg-white p-5">
+          <p className="text-sm font-medium text-black">
+            Revenue from paid orders
+          </p>
+          <p className="mt-2 text-2xl font-bold text-black">{money(revenue)}</p>
+          <p className="mt-1 text-xs text-neutral-800">
+            Based on loaded orders
+          </p>
         </div>
       </section>
 
       <section className="rounded-2xl border border-neutral-300 bg-white p-5 text-black sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-bold text-black">All orders</h2>
+            <h2 className="text-lg font-bold text-black">
+              {filters.find((item) => item.value === filter)?.label ?? "All Orders"}
+            </h2>
             <p className="mt-1 text-sm text-black">
               {filteredOrders.length} matching orders
               {pendingCount > 0 ? ` · ${pendingCount} awaiting payment` : ""}
@@ -301,6 +429,38 @@ export default function AdminOrdersPage() {
             className="w-full rounded-xl border border-neutral-400 bg-white px-4 py-3 text-sm font-medium text-black placeholder:text-neutral-700 outline-none focus:border-black focus:ring-1 focus:ring-black sm:max-w-sm"
           />
         </div>
+
+        <div className="mt-5 flex gap-2 overflow-x-auto pb-3">
+          {filters.map((item) => {
+            const active = filter === item.value;
+
+            return (
+              <button
+                key={item.value}
+                type="button"
+                onClick={() => setFilter(item.value)}
+                aria-pressed={active}
+                className={`shrink-0 rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
+                  active
+                    ? "border-black bg-black text-white"
+                    : "border-neutral-300 bg-white text-black hover:bg-neutral-100"
+                }`}
+              >
+                {item.label}
+                <span className="ml-2 opacity-70">
+                  {counts[item.value]}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {filter === "to_ship" && (
+          <p className="mb-3 text-xs font-medium text-neutral-700">
+            Showing paid orders with status Confirmed or Processing. Payment
+            Review orders are kept separate until verified.
+          </p>
+        )}
 
         {loading && (
           <p className="py-12 text-center text-sm font-medium text-black">
@@ -323,7 +483,9 @@ export default function AdminOrdersPage() {
 
         {!loading && !error && filteredOrders.length === 0 && (
           <p className="py-12 text-center text-sm font-medium text-black">
-            {search ? "No orders match your search." : "No orders found yet."}
+            {search || filter !== "all"
+              ? "No orders match this filter."
+              : "No orders found yet."}
           </p>
         )}
 
@@ -331,10 +493,12 @@ export default function AdminOrdersPage() {
           <div className="mt-6 space-y-4">
             {filteredOrders.map((order) => {
               const expanded = expandedId === order.id;
-              const paid =
-                (order.payment_status ?? "").toLowerCase() === "paid";
+              const paid = isPaid(order);
 
-              const nextStatus: Record<string, "processing" | "shipped" | "delivered"> = {
+              const nextStatus: Record<
+                string,
+                "processing" | "shipped" | "delivered"
+              > = {
                 confirmed: "processing",
                 processing: "shipped",
                 shipped: "delivered",
@@ -353,12 +517,18 @@ export default function AdminOrdersPage() {
                 >
                   <button
                     type="button"
-                    onClick={() => setExpandedId(expanded ? null : order.id)}
+                    onClick={() => {
+                      setExpandedId(expanded ? null : order.id);
+                      setStatusMessage("");
+                      setStatusError("");
+                    }}
                     aria-expanded={expanded}
                     className="grid w-full gap-4 p-4 text-left text-black transition hover:bg-neutral-50 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:p-5"
                   >
                     <div className="min-w-0">
-                      <p className="font-bold text-black">{order.customer_name}</p>
+                      <p className="font-bold text-black">
+                        {order.customer_name}
+                      </p>
                       <p className="mt-1 break-all text-xs font-medium text-black">
                         Order #{order.id}
                       </p>
@@ -368,48 +538,122 @@ export default function AdminOrdersPage() {
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClass(order.payment_status)}`}>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClass(
+                          order.payment_status
+                        )}`}
+                      >
                         Payment: {order.payment_status ?? "Unknown"}
                       </span>
-                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClass(order.order_status)}`}>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClass(
+                          order.order_status
+                        )}`}
+                      >
                         Order: {order.order_status ?? "Unknown"}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between gap-4 sm:justify-end">
-                      <span className="text-lg font-bold text-black">{money(order.total)}</span>
-                      <span className="font-bold text-black">{expanded ? "−" : "+"}</span>
+                      <span className="text-lg font-bold text-black">
+                        {money(order.total)}
+                      </span>
+                      <span className="font-bold text-black">
+                        {expanded ? "−" : "+"}
+                      </span>
                     </div>
                   </button>
 
                   {expanded && (
                     <div className="border-t border-neutral-300 bg-white p-4 text-black sm:p-5">
                       <section className="mb-7 rounded-2xl border border-neutral-300 bg-neutral-50 p-4 sm:p-5">
-                        <h3 className="font-bold text-black">Order fulfillment</h3>
+                        <h3 className="font-bold text-black">
+                          Order fulfillment
+                        </h3>
+
                         <p className="mt-2 text-sm text-black">
-                          Current status: <span className="font-semibold">{order.order_status ?? "Unknown"}</span>
+                          Current status:{" "}
+                          <span className="font-semibold">
+                            {order.order_status ?? "Unknown"}
+                          </span>
                         </p>
 
                         {statusMessage && (
-                          <p className="mt-3 text-sm font-semibold text-green-800" role="status">
+                          <p
+                            className="mt-3 text-sm font-semibold text-green-800"
+                            role="status"
+                          >
                             {statusMessage}
                           </p>
                         )}
 
                         {statusError && (
-                          <p className="mt-3 text-sm font-semibold text-red-800" role="alert">
+                          <p
+                            className="mt-3 text-sm font-semibold text-red-800"
+                            role="alert"
+                          >
                             {statusError}
                           </p>
                         )}
 
-                        {!paid ? (
+                        {order.order_status === "payment_review" ? (
+                          <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
+                            <p className="font-bold text-amber-950">
+                              Payment requires verification
+                            </p>
+
+                            <p className="mt-2 text-sm leading-6 text-amber-950">
+                              Check the payment in your Razorpay dashboard.
+                              Confirmation requires a successful Razorpay
+                              verification.
+                            </p>
+
+                            {order.payment_id && (
+                              <a
+                                href={`https://dashboard.razorpay.com/app/payments/${encodeURIComponent(
+                                  order.payment_id
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-3 inline-flex rounded-lg border border-amber-800 px-4 py-2 text-sm font-semibold text-amber-950 underline underline-offset-2"
+                              >
+                                Open payment in Razorpay dashboard
+                              </a>
+                            )}
+
+                            <div className="mt-4 border-t border-amber-200 pt-4">
+                              <p className="text-sm font-semibold text-amber-950">
+                                Expected payment: {money(order.total)}
+                              </p>
+
+                              <button
+                                type="button"
+                                disabled={
+                                  verifyingOrderId === order.id ||
+                                  !order.payment_id ||
+                                  !order.payment_order_id
+                                }
+                                onClick={() =>
+                                  void verifyAndConfirmPayment(order.id)
+                                }
+                                className="mt-3 w-full rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                              >
+                                {verifyingOrderId === order.id
+                                  ? "Checking Razorpay..."
+                                  : "Verify payment & confirm order"}
+                              </button>
+                            </div>
+                          </div>
+                        ) : !paid ? (
                           <p className="mt-3 text-sm font-medium text-red-800">
-                            Fulfillment is disabled because this order is not marked as paid.
+                            Fulfillment is disabled because this order is not
+                            marked as paid.
                           </p>
                         ) : order.order_status === "processing" ? (
                           <div className="mt-4 space-y-4">
                             <p className="text-sm text-black">
-                              Enter the courier details before marking this order as shipped.
+                              Enter the courier details before marking this
+                              order as shipped.
                             </p>
 
                             <div className="grid gap-4 sm:grid-cols-2">
@@ -417,7 +661,9 @@ export default function AdminOrdersPage() {
                                 Courier name
                                 <input
                                   value={courierName}
-                                  onChange={(event) => setCourierName(event.target.value)}
+                                  onChange={(event) =>
+                                    setCourierName(event.target.value)
+                                  }
                                   placeholder="e.g. Delhivery, Blue Dart"
                                   maxLength={100}
                                   className={inputClass}
@@ -428,7 +674,9 @@ export default function AdminOrdersPage() {
                                 Tracking / AWB number
                                 <input
                                   value={trackingNumber}
-                                  onChange={(event) => setTrackingNumber(event.target.value)}
+                                  onChange={(event) =>
+                                    setTrackingNumber(event.target.value)
+                                  }
                                   placeholder="Enter tracking number"
                                   maxLength={100}
                                   className={inputClass}
@@ -440,7 +688,9 @@ export default function AdminOrdersPage() {
                                 <input
                                   type="url"
                                   value={trackingUrl}
-                                  onChange={(event) => setTrackingUrl(event.target.value)}
+                                  onChange={(event) =>
+                                    setTrackingUrl(event.target.value)
+                                  }
                                   placeholder="https://courier.example/track"
                                   maxLength={2048}
                                   className={inputClass}
@@ -451,19 +701,28 @@ export default function AdminOrdersPage() {
                             <button
                               type="button"
                               disabled={updatingOrderId === order.id}
-                              onClick={() => void updateOrderStatus(order.id, "shipped")}
+                              onClick={() =>
+                                void updateOrderStatus(order.id, "shipped")
+                              }
                               className="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                              {updatingOrderId === order.id ? "Updating..." : "Save tracking & mark shipped"}
+                              {updatingOrderId === order.id
+                                ? "Updating..."
+                                : "Save tracking & mark shipped"}
                             </button>
                           </div>
-                        ) : order.order_status === "confirmed" || order.order_status === "shipped" ? (
+                        ) : order.order_status === "confirmed" ||
+                          order.order_status === "shipped" ? (
                           <button
                             type="button"
                             disabled={updatingOrderId === order.id}
                             onClick={() => {
-                              const status = nextStatus[order.order_status ?? ""];
-                              if (status) void updateOrderStatus(order.id, status);
+                              const status =
+                                nextStatus[order.order_status ?? ""];
+
+                              if (status) {
+                                void updateOrderStatus(order.id, status);
+                              }
                             }}
                             className="mt-4 rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
                           >
@@ -477,11 +736,18 @@ export default function AdminOrdersPage() {
                           </p>
                         ) : null}
 
-                        {(order.courier_name || order.tracking_number || order.tracking_url) && (
+                        {(order.courier_name ||
+                          order.tracking_number ||
+                          order.tracking_url) && (
                           <div className="mt-5 space-y-2 border-t border-neutral-300 pt-4 text-sm text-black">
-                            <h4 className="font-bold">Saved tracking details</h4>
+                            <h4 className="font-bold">
+                              Saved tracking details
+                            </h4>
                             <p>Courier: {order.courier_name ?? "—"}</p>
-                            <p>Tracking number: {order.tracking_number ?? "—"}</p>
+                            <p>
+                              Tracking number: {order.tracking_number ?? "—"}
+                            </p>
+
                             {order.tracking_url && (
                               <p>
                                 Tracking link:{" "}
@@ -495,8 +761,13 @@ export default function AdminOrdersPage() {
                                 </a>
                               </p>
                             )}
-                            <p>Shipped: {formatDate(order.shipped_at ?? null)}</p>
-                            <p>Delivered: {formatDate(order.delivered_at ?? null)}</p>
+
+                            <p>
+                              Shipped: {formatDate(order.shipped_at ?? null)}
+                            </p>
+                            <p>
+                              Delivered: {formatDate(order.delivered_at ?? null)}
+                            </p>
                           </div>
                         )}
                       </section>
@@ -504,23 +775,35 @@ export default function AdminOrdersPage() {
                       <div className="grid gap-6 lg:grid-cols-2">
                         <section>
                           <h3 className="font-bold text-black">Customer</h3>
+
                           <div className="mt-3 space-y-2 text-sm font-medium text-black">
                             <p>{order.customer_name}</p>
+
                             {order.customer_email && (
                               <p className="break-all">
-                                <a href={`mailto:${order.customer_email}`} className="text-black underline underline-offset-2">
+                                <a
+                                  href={`mailto:${order.customer_email}`}
+                                  className="text-black underline underline-offset-2"
+                                >
                                   {order.customer_email}
                                 </a>
                               </p>
                             )}
+
                             <p>
-                              <a href={`tel:${order.customer_phone}`} className="text-black underline underline-offset-2">
+                              <a
+                                href={`tel:${order.customer_phone}`}
+                                className="text-black underline underline-offset-2"
+                              >
                                 {order.customer_phone}
                               </a>
                             </p>
                           </div>
 
-                          <h3 className="mt-6 font-bold text-black">Shipping address</h3>
+                          <h3 className="mt-6 font-bold text-black">
+                            Shipping address
+                          </h3>
+
                           <p className="mt-3 whitespace-pre-line text-sm font-medium leading-6 text-black">
                             {[
                               order.shipping_address,
@@ -528,28 +811,56 @@ export default function AdminOrdersPage() {
                               order.shipping_state,
                               order.shipping_pincode,
                               order.shipping_country,
-                            ].filter(Boolean).join(", ")}
+                            ]
+                              .filter(Boolean)
+                              .join(", ")}
                           </p>
                         </section>
 
                         <section>
-                          <h3 className="font-bold text-black">Payment details</h3>
+                          <h3 className="font-bold text-black">
+                            Payment details
+                          </h3>
+
                           <div className="mt-3 space-y-2 text-sm font-medium text-black">
                             <p>Method: {order.payment_method ?? "—"}</p>
                             <p>Payment status: {order.payment_status ?? "—"}</p>
-                            <p>Payment ID: {order.payment_id ?? "—"}</p>
-                            <p className="break-all">Razorpay order ID: {order.payment_order_id ?? "—"}</p>
+                            <p className="break-all">
+                              Payment ID: {order.payment_id ?? "—"}
+                            </p>
+                            <p className="break-all">
+                              Razorpay order ID: {order.payment_order_id ?? "—"}
+                            </p>
+
+                            {order.payment_id && (
+                              <a
+                                href={`https://dashboard.razorpay.com/app/payments/${encodeURIComponent(
+                                  order.payment_id
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-block pt-1 font-semibold underline underline-offset-2"
+                              >
+                                View payment in Razorpay
+                              </a>
+                            )}
                           </div>
 
                           <div className="mt-5 space-y-2 border-t border-neutral-300 pt-4 text-sm text-black">
                             <div className="flex justify-between gap-4">
                               <span className="font-medium">Subtotal</span>
-                              <span className="font-semibold">{money(order.subtotal)}</span>
+                              <span className="font-semibold">
+                                {money(order.subtotal)}
+                              </span>
                             </div>
+
                             <div className="flex justify-between gap-4">
                               <span className="font-medium">Delivery</span>
-                              <span className="font-semibold">{money(order.delivery_charge)}</span>
+                              <span className="font-semibold">
+                                {money(order.delivery_charge)}
+                              </span>
                             </div>
+
                             <div className="flex justify-between gap-4 border-t border-neutral-300 pt-3 font-bold">
                               <span>Total</span>
                               <span>{money(order.total)}</span>
@@ -559,7 +870,9 @@ export default function AdminOrdersPage() {
                       </div>
 
                       <section className="mt-7">
-                        <h3 className="font-bold text-black">Products ordered</h3>
+                        <h3 className="font-bold text-black">
+                          Products ordered
+                        </h3>
 
                         {order.items.length === 0 ? (
                           <p className="mt-3 text-sm font-medium text-black">
@@ -568,7 +881,10 @@ export default function AdminOrdersPage() {
                         ) : (
                           <div className="mt-3 divide-y divide-neutral-300">
                             {order.items.map((item) => (
-                              <div key={item.id} className="flex items-center gap-4 py-4 text-black">
+                              <div
+                                key={item.id}
+                                className="flex items-center gap-4 py-4 text-black"
+                              >
                                 {item.image_url ? (
                                   // eslint-disable-next-line @next/next/no-img-element
                                   <img
@@ -583,7 +899,9 @@ export default function AdminOrdersPage() {
                                 )}
 
                                 <div className="min-w-0 flex-1">
-                                  <p className="font-semibold text-black">{item.product_name}</p>
+                                  <p className="font-semibold text-black">
+                                    {item.product_name}
+                                  </p>
                                   <p className="mt-1 text-xs font-medium text-black">
                                     {item.weight ? `${item.weight} · ` : ""}
                                     Qty: {item.quantity}
@@ -591,8 +909,12 @@ export default function AdminOrdersPage() {
                                 </div>
 
                                 <div className="shrink-0 text-right">
-                                  <p className="font-bold text-black">{money(item.price * item.quantity)}</p>
-                                  <p className="mt-1 text-xs font-medium text-black">{money(item.price)} each</p>
+                                  <p className="font-bold text-black">
+                                    {money(item.price * item.quantity)}
+                                  </p>
+                                  <p className="mt-1 text-xs font-medium text-black">
+                                    {money(item.price)} each
+                                  </p>
                                 </div>
                               </div>
                             ))}
