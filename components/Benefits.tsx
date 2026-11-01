@@ -63,7 +63,7 @@ export default function Benefits() {
             <p className="tracking-[0.4em] uppercase text-xs text-neutral-400">
               Why Pearl
             </p>
-            <h2 className="mt-4 font-serif text-5xl font-light italic leading-tight text-neutral-900">
+            <h2 className="mt-4 text-5xl font-serif font-light text-neutral-900">
               The Art of
               <br />
               Natural Transformation
@@ -84,7 +84,7 @@ export default function Benefits() {
                 <p className="text-xs tracking-widest text-neutral-300 font-light mb-4">
                   {benefit.number}
                 </p>
-                <h3 className="font-serif text-xl font-light italic text-neutral-900 mb-3">
+                <h3 className="mt-4 text-5xl font-serif font-light text-neutral-900">
                   {benefit.title}
                 </h3>
                 <div className="h-px w-8 bg-neutral-200 mb-4" />
@@ -101,17 +101,17 @@ export default function Benefits() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
-            className="mt-20 flex flex-col items-center text-center"
+            className="mt-22 flex flex-col items-center text-center"
           >
             <p className="tracking-[0.4em] uppercase text-xs text-neutral-400 mb-4">
               Ready to Begin
             </p>
-            <h3 className="font-serif text-3xl font-light italic text-neutral-900 mb-8">
+            <h3 className="mt-4 mb-12 text-5xl font-serif font-light text-neutral-900">
               Find Your Perfect Formula
             </h3>
             <button
               onClick={() => setShowApp(true)}
-              className="inline-flex items-center gap-3 rounded-full border border-neutral-900 px-10 py-3.5 text-xs tracking-[0.3em] uppercase text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300"
+              className="inline-flex items-center gap-3 rounded-full border border-neutral-900 px-10 py-3.5 text-xs tracking-[0.4em] uppercase text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300"
             >
               View Applications
             </button>

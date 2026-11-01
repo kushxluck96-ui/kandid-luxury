@@ -6,6 +6,7 @@ import {
   Sparkles,
   Hand,
   Heart,
+  Notebook,
 } from "lucide-react";
 
 const steps = [
@@ -21,7 +22,7 @@ const steps = [
     title: "Step 2",
     subtitle: "Mix",
     description:
-      "Mix a small amount of Pearl Powder with water, rose water or yogurt to create a smooth paste.",
+      "Mix a small amount of Pearl Powder with your favorite ingredient to create a smooth paste and apply twice a week for best results.",
   },
   {
     icon: Hand,
@@ -37,6 +38,7 @@ const steps = [
     description:
       "Leave for 10–15 minutes, then rinse with lukewarm water and moisturize.",
   },
+  {icon: Notebook, title: "", subtitle: "Note", description: "Every skin is different, so please ensure which ingredients suit you best to see the quickest results. Pro tip: Always perform a patch test on your inner wrist or neck before applying it to your face, especially if you have a known allergy to shellfish or calcium supplements"},
 ];
 
 export default function HowToApply() {

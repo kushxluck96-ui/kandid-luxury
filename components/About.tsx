@@ -58,7 +58,7 @@ export default function About() {
             {content.sectionLabel}
           </p>
 
-          <h2 className="mt-6 text-5xl font-serif font-light italic leading-tight text-neutral-900 whitespace-pre-line">
+          <h2 className="mt-4 text-5xl font-serif font-light text-neutral-900">
             {content.heading}
           </h2>
 

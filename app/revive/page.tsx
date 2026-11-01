@@ -179,7 +179,7 @@ export default function RevivePage() {
                 <div className="absolute top-1/2 h-[270px] w-[270px] -translate-y-1/2 rounded-full bg-white/80 blur-[65px] sm:h-[340px] sm:w-[340px]" />
 
                 <p className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 select-none font-serif text-[10rem] font-light leading-none text-black/[0.025]">
-                  01
+                  02
                 </p>
 
                 {/* MAIN IMAGE */}
@@ -394,7 +394,7 @@ export default function RevivePage() {
                 transition={{ duration: 1, delay: 0.3 }}
                 className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 select-none font-serif text-[24rem] font-light leading-none text-black/[0.025]"
               >
-                01
+                02
               </motion.p>
 
               <div className="absolute h-[500px] w-[500px] rounded-full bg-white/80 blur-[90px]" />
@@ -511,14 +511,14 @@ export default function RevivePage() {
 
             <p className="mx-auto mt-7 max-w-2xl text-sm leading-8 text-neutral-500 md:text-base">
               Revive Anti-Aging Botox Face Pack is a powder-based facial
-              treatment formulated with Acetyl Hexapeptide-8, Allantoin
+              Pack formulated with Acetyl Hexapeptide-8, Allantoin
               and Panthenol. Designed as an at-home skincare ritual,
               it helps leave the skin feeling smooth, refreshed and
               looking more radiant.
             </p>
 
             <p className="mt-5 text-xs leading-6 text-neutral-400">
-              A cosmetic skincare treatment. Not an injectable Botox
+              A cosmetic skincare product. Not an injectable Botox
               treatment and does not paralyze facial muscles.
             </p>
           </div>
@@ -644,7 +644,7 @@ export default function RevivePage() {
                 </h3>
 
                 <p className="mt-5 text-sm text-neutral-500">
-                  A simple treatment ritual, 1–2 times a week.
+                  A simple skincare ritual, 1–2 times a week.
                 </p>
               </div>
 
