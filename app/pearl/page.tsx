@@ -246,7 +246,7 @@ export default function PearlPage() {
                 </div>
 
                 <p className="mt-2 text-[8px] uppercase tracking-[0.25em] text-neutral-400">
-                  Select a photo · {pearlImages.indexOf(selectedImage) + 1} / 7
+                  Select a photo · {pearlImages.indexOf(selectedImage) + 1} / {pearlImages.length}
                 </p>
               </div>
 
@@ -461,7 +461,7 @@ export default function PearlPage() {
               </div>
 
               <p className="relative z-10 mt-3 text-[8px] uppercase tracking-[0.25em] text-neutral-400">
-                Select a photo · {pearlImages.indexOf(selectedImage) + 1} / 7
+                Select a photo · {pearlImages.indexOf(selectedImage) + 1} / images.length
               </p>
 
               <div className="absolute bottom-[5%] left-1/2 h-8 w-64 -translate-x-1/2 rounded-full bg-black/10 blur-3xl" />

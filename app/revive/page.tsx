@@ -524,16 +524,16 @@ export default function RevivePage() {
           </div>
 
           {/* BENEFITS */}
-          <div className="mt-24">
-            <div className="text-center">
-              <p className="text-[9px] uppercase tracking-[0.4em] text-neutral-400">
-                Why Revive
-              </p>
+<div className="mt-24">
+  <div className="text-center">
+    <p className="text-[11px] uppercase tracking-[0.4em] text-neutral-500">
+      Why Revive
+    </p>
 
-              <h3 className="mt-4 font-serif text-3xl font-light text-neutral-900 md:text-4xl">
-                The benefits of the ritual
-              </h3>
-            </div>
+    <h3 className="mt-6 font-serif text-4xl font-light leading-tight tracking-tight text-neutral-900 md:text-6xl">
+      The benefits of the ritual
+    </h3>
+  </div>
 
             <div className="mt-14 grid gap-px bg-[#DDE5E7] sm:grid-cols-2 lg:grid-cols-4">
               {[
@@ -562,23 +562,23 @@ export default function RevivePage() {
                     "Leaves skin looking refreshed, smooth and radiant.",
                 },
               ].map((benefit) => (
-                <div
-                  key={benefit.number}
-                  className="bg-[#F8FAFA] px-7 py-10"
-                >
-                  <p className="font-serif text-3xl font-light text-[#C5B18E]">
-                    {benefit.number}
-                  </p>
+  <div
+    key={benefit.number}
+    className="bg-[#F8FAFA] px-7 py-10"
+  >
+    <p className="font-serif text-4xl font-light text-[#C5B18E]">
+      {benefit.number}
+    </p>
 
-                  <h4 className="mt-7 text-sm font-medium text-neutral-900">
-                    {benefit.title}
-                  </h4>
+    <h4 className="mt-7 text-base font-semibold text-neutral-900">
+      {benefit.title}
+    </h4>
 
-                  <p className="mt-3 text-xs leading-6 text-neutral-500">
-                    {benefit.description}
-                  </p>
-                </div>
-              ))}
+    <p className="mt-3 text-sm leading-7 text-neutral-600">
+      {benefit.description}
+    </p>
+  </div>
+))}
             </div>
           </div>
 
@@ -639,16 +639,18 @@ export default function RevivePage() {
                   Your skincare ritual
                 </p>
 
-                <h3 className="mt-4 font-serif text-4xl font-light text-neutral-900 md:text-5xl">
+                <h3 className="mt-4 font-serif text-5xl font-light text-neutral-900 md:text-5xl">
                   How to use Revive
                 </h3>
 
-                <p className="mt-5 text-sm text-neutral-500">
+                <p className="mt-5 text-md text-neutral-500">
                   A simple skincare ritual, 1–2 times a week.
                 </p>
               </div>
 
-              <div className="mt-14 space-y-8">
+              <div className="mt-3 space-y-4 divide-y divide-black/10 border-t border-black/10 pt-6   leading-7 text-neutral-900">
+                
+                
                 {[
                   {
                     number: "01",
@@ -679,18 +681,18 @@ export default function RevivePage() {
                     key={step.number}
                     className="flex gap-6 border-b border-black/10 pb-7"
                   >
-                    <span className="font-serif text-2xl font-light text-[#B69B70]">
+                    <span className="font-serif text-3xl font-light text-[#B69B70]">
                       {step.number}
                     </span>
 
                     <div>
-                      <h4 className="text-sm font-medium text-neutral-900">
+                      <h4 className="text-lg font-medium text-neutral-900">
                         {step.title}
                       </h4>
 
-                      <p className="mt-2 text-xs leading-7 text-neutral-500 md:text-sm">
-                        {step.description}
-                      </p>
+                      <p className="mt-3 text-lg leading-8 font-normal text-neutral-700">
+  {step.description}
+</p>
                     </div>
                   </div>
                 ))}
@@ -710,7 +712,7 @@ export default function RevivePage() {
                 Important information
               </p>
 
-              <h3 className="mt-4 font-serif text-3xl font-light text-neutral-900">
+              <h3 className="mt-4 font-serif text-4xl font-light text-neutral-900">
                 Precautions
               </h3>
 
@@ -733,7 +735,7 @@ export default function RevivePage() {
                 Product care
               </p>
 
-              <h3 className="mt-4 font-serif text-3xl font-light text-neutral-900">
+              <h3 className="mt-4 font-serif text-4xl font-light text-neutral-900">
                 Storage
               </h3>
 

@@ -57,7 +57,7 @@ export default function HowToApply() {
             HOW TO APPLY
           </p>
 
-          <h2 className="mt-4 text-5xl font-serif font-light text-neutral-900">
+          <h2 className="mt-4 text-5xl font-serif font-light text-neutral-700">
             Your Luxury Ritual
           </h2>
 
@@ -81,7 +81,7 @@ export default function HowToApply() {
                 viewport={{ once: true }}
                 className="rounded-[32px] border border-neutral-200 bg-white/70 p-8 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.05)]"
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-700 text-white">
                   <Icon size={24} />
                 </div>
 
@@ -89,7 +89,7 @@ export default function HowToApply() {
                   {step.title}
                 </p>
 
-                <h3 className="mt-2 text-2xl font-semibold text-neutral-900">
+                <h3 className="mt-2 text-2xl font-semibold text-neutral-700">
                   {step.subtitle}
                 </h3>
 
