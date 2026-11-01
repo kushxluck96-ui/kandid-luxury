@@ -85,7 +85,6 @@ export default function CheckoutPage() {
   const [confirmedOrder, setConfirmedOrder] = useState("");
   const [paymentReview, setPaymentReview] = useState(false);
 
-  // Load saved addresses and customer details.
   useEffect(() => {
     let active = true;
 
@@ -157,7 +156,6 @@ export default function CheckoutPage() {
     };
   }, []);
 
-  // Check whether Razorpay is already available.
   useEffect(() => {
     if (window.Razorpay) {
       setScriptReady(true);
@@ -175,7 +173,6 @@ export default function CheckoutPage() {
   function updateField(field: keyof CheckoutForm, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
 
-    // Once the customer edits a prefilled address, treat it as manual.
     if (
       ["name", "phone", "address", "city", "state", "pincode"].includes(field)
     ) {
@@ -281,7 +278,6 @@ export default function CheckoutPage() {
     setLoading(true);
 
     try {
-      // Keep the existing checkout API payload unchanged.
       const checkoutResult = await postJSON("/api/checkout", {
         ...form,
         items: items.map((item) => ({
@@ -469,7 +465,7 @@ export default function CheckoutPage() {
     return (
       <main className="flex min-h-[100dvh] items-center justify-center bg-[#F8F8F6] px-5 py-10 text-black">
         <section className="mx-auto w-full max-w-xl text-center">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.25em]">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em]">
             KANDID LUXURY
           </p>
 
@@ -479,20 +475,20 @@ export default function CheckoutPage() {
               : "Thank you for your order."}
           </h1>
 
-          <p className="mt-5 text-sm leading-6 text-neutral-600 sm:text-base sm:leading-7">
+          <p className="mt-5 text-base leading-7 text-neutral-600">
             {paymentReview
               ? "Your payment was received, but your order requires manual review. Please do not make another payment. Our team needs to review your order before confirming fulfilment."
               : "Your payment has been verified successfully and your order is confirmed."}
           </p>
 
-          <p className="mt-4 break-all text-xs text-neutral-500">
+          <p className="mt-4 break-all text-sm text-neutral-500">
             Order ID: {confirmedOrder}
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
               href="/shop"
-              className="bg-black px-7 py-3.5 text-[10px] font-medium uppercase tracking-[0.2em] text-white"
+              className="bg-black px-7 py-4 text-xs font-medium uppercase tracking-[0.15em] text-white"
             >
               Continue Shopping
             </Link>
@@ -501,7 +497,7 @@ export default function CheckoutPage() {
               href={`/order-status?orderId=${encodeURIComponent(
                 confirmedOrder
               )}`}
-              className="border border-black/20 px-7 py-3.5 text-[10px] font-medium uppercase tracking-[0.2em]"
+              className="border border-black/20 px-7 py-4 text-xs font-medium uppercase tracking-[0.15em]"
             >
               Track Your Order
             </Link>
@@ -524,67 +520,67 @@ export default function CheckoutPage() {
         }
       />
 
-      <main className="min-h-[100dvh] bg-[#F8F8F6] px-3 pb-36 pt-4 text-black sm:px-8 sm:pb-10 sm:pt-8">
+      <main className="min-h-[100dvh] bg-[#F8F8F6] px-4 pb-40 pt-5 text-black sm:px-8 sm:pb-10 sm:pt-8">
         <div className="mx-auto max-w-6xl">
           {/* Header */}
-          <header className="mb-6 flex h-10 items-center justify-between sm:mb-9">
+          <header className="mb-8 flex h-11 items-center justify-between sm:mb-10">
             <Link
               href="/cart"
-              className="text-[10px] font-medium uppercase tracking-[0.15em] text-neutral-600"
+              className="text-xs font-medium uppercase tracking-[0.12em] text-neutral-600"
             >
               ← Back to bag
             </Link>
 
-            <span className="text-[10px] font-semibold tracking-[0.25em]">
+            <span className="text-xs font-semibold tracking-[0.2em]">
               KANDID LUXURY
             </span>
 
-            <span className="text-[9px] uppercase tracking-[0.2em] text-neutral-400">
+            <span className="text-[11px] uppercase tracking-[0.15em] text-neutral-400">
               Secure
             </span>
           </header>
 
-          <div className="mb-6 sm:mb-9">
-            <h1 className="text-lg font-medium tracking-tight sm:text-2xl">
+          <div className="mb-8 sm:mb-10">
+            <h1 className="text-2xl font-medium tracking-tight sm:text-3xl">
               Checkout
             </h1>
 
-            <p className="mt-2 text-xs leading-5 text-neutral-500 sm:text-sm">
+            <p className="mt-2 text-sm leading-6 text-neutral-500 sm:text-base">
               Complete your details to continue to secure payment.
             </p>
           </div>
 
           {items.length === 0 ? (
             <section className="border-t border-black/10 py-10">
-              <p className="text-sm text-neutral-600">
+              <p className="text-base text-neutral-600">
                 Your shopping bag is empty.
               </p>
 
               <Link
                 href="/shop"
-                className="mt-6 inline-block bg-black px-7 py-3.5 text-[10px] font-medium uppercase tracking-[0.2em] text-white"
+                className="mt-6 inline-block bg-black px-7 py-4 text-xs font-medium uppercase tracking-[0.15em] text-white"
               >
                 Explore Skincare
               </Link>
             </section>
           ) : (
-            <div className="grid items-start gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:gap-8">
+            <div className="grid items-start gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:gap-8">
               {/* Order summary */}
-              <aside className="order-1 h-fit border border-black/[0.07] bg-white/70 p-3 sm:p-5 lg:order-2 lg:p-6">
+              <aside className="order-1 h-fit border border-black/[0.07] bg-white/70 p-4 sm:p-5 lg:order-2 lg:p-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-medium tracking-tight sm:text-lg">
+                  <h2 className="text-lg font-medium tracking-tight sm:text-xl">
                     Your Order
                   </h2>
 
-                  <span className="text-[10px] text-neutral-500">
+                  <span className="text-xs text-neutral-500">
                     {totalItems} items
                   </span>
                 </div>
 
-                <div className="mt-4 space-y-3 sm:mt-5 sm:space-y-4">
+                <div className="mt-5 space-y-4">
                   {items.map((item) => (
-                    <div key={item.id} className="flex gap-3">
-                      <div className="relative h-[68px] w-[68px] shrink-0 bg-[#EEF1EF] sm:h-20 sm:w-20">
+                    <div key={item.id} className="flex gap-3 sm:gap-4">
+                      <div className="relative h-[76px] w-[76px] shrink-0 bg-[#EEF1EF] sm:h-20 sm:w-20">
                         {item.image_url && (
                           <Image
                             src={item.image_url}
@@ -597,15 +593,15 @@ export default function CheckoutPage() {
                       </div>
 
                       <div className="flex min-w-0 flex-1 flex-col justify-center">
-                        <p className="text-xs font-medium leading-4 sm:text-sm">
+                        <p className="text-sm font-medium leading-5 sm:text-base">
                           {item.name}
                         </p>
 
-                        <p className="mt-1 text-[10px] text-neutral-500 sm:text-xs">
+                        <p className="mt-1 text-xs text-neutral-500">
                           Quantity: {item.quantity}
                         </p>
 
-                        <p className="mt-1 text-sm font-semibold">
+                        <p className="mt-1 text-base font-semibold">
                           {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
@@ -613,35 +609,35 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
-                <div className="mt-4 space-y-3 border-t border-black/10 pt-4 text-xs sm:mt-5 sm:text-sm">
+                <div className="mt-5 space-y-4 border-t border-black/10 pt-5 text-sm">
                   <div className="flex justify-between gap-4">
                     <span className="text-neutral-500">
                       Bag Subtotal ({totalItems} items)
                     </span>
-                    <span>{formatPrice(subtotal)}</span>
+                    <span className="font-medium">{formatPrice(subtotal)}</span>
                   </div>
 
                   <div className="flex justify-between gap-4">
                     <span className="text-neutral-500">Delivery</span>
-                    <span className="text-[10px] uppercase tracking-wider">
+                    <span className="text-xs font-medium uppercase tracking-wider">
                       Free
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between border-t border-black/10 pt-4">
                     <div>
-                      <p className="text-xs font-medium">Total Amount</p>
-                      <p className="mt-1 text-[10px] text-neutral-500">
+                      <p className="text-sm font-medium">Total Amount</p>
+                      <p className="mt-1 text-xs text-neutral-500">
                         Inclusive of free delivery
                       </p>
                     </div>
 
-                    <span className="text-xl font-semibold tracking-tight sm:text-2xl">
+                    <span className="text-2xl font-semibold tracking-tight">
                       {formatPrice(subtotal)}
                     </span>
                   </div>
 
-                  <p className="text-[10px] leading-4 text-neutral-500 sm:text-xs sm:leading-5">
+                  <p className="text-xs leading-5 text-neutral-500">
                     Final price and stock are checked by the server before payment.
                   </p>
                 </div>
@@ -651,15 +647,15 @@ export default function CheckoutPage() {
               <form
                 id="checkout-form"
                 onSubmit={handleCheckout}
-                className="order-2 space-y-6 lg:order-1 lg:space-y-7"
+                className="order-2 space-y-8 lg:order-1 lg:space-y-9"
               >
                 {/* Contact details */}
                 <section>
-                  <h2 className="mb-4 text-base font-medium tracking-tight sm:text-lg">
+                  <h2 className="mb-4 text-lg font-medium tracking-tight sm:text-xl">
                     Contact Details
                   </h2>
 
-                  <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-3">
                     <input
                       required
                       maxLength={120}
@@ -667,7 +663,7 @@ export default function CheckoutPage() {
                       placeholder="Full name"
                       value={form.name}
                       onChange={(e) => updateField("name", e.target.value)}
-                      className="col-span-2 w-full border border-black/15 bg-white px-3 py-3.5 text-sm font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black sm:col-span-1 sm:px-4 sm:py-4"
+                      className="col-span-2 w-full border border-black/15 bg-white px-4 py-4 text-base font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black sm:col-span-1"
                     />
 
                     <input
@@ -685,7 +681,7 @@ export default function CheckoutPage() {
                           e.target.value.replace(/\D/g, "").slice(0, 10)
                         )
                       }
-                      className="col-span-2 w-full border border-black/15 bg-white px-3 py-3.5 text-sm font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black sm:col-span-1 sm:px-4 sm:py-4"
+                      className="col-span-2 w-full border border-black/15 bg-white px-4 py-4 text-base font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black sm:col-span-1"
                     />
 
                     <input
@@ -695,7 +691,7 @@ export default function CheckoutPage() {
                       placeholder="Email address (optional)"
                       value={form.email}
                       onChange={(e) => updateField("email", e.target.value)}
-                      className="col-span-2 w-full border border-black/15 bg-white px-3 py-3.5 text-sm font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black sm:px-4 sm:py-4"
+                      className="col-span-2 w-full border border-black/15 bg-white px-4 py-4 text-base font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black"
                     />
                   </div>
                 </section>
@@ -703,13 +699,13 @@ export default function CheckoutPage() {
                 {/* Shipping address */}
                 <section>
                   <div className="mb-4 flex items-center justify-between gap-3">
-                    <h2 className="text-base font-medium tracking-tight sm:text-lg">
+                    <h2 className="text-lg font-medium tracking-tight sm:text-xl">
                       Shipping Address
                     </h2>
 
                     <Link
                       href="/account"
-                      className="text-[10px] font-medium uppercase tracking-[0.12em] text-neutral-500 underline underline-offset-4 hover:text-black"
+                      className="text-xs font-medium uppercase tracking-[0.08em] text-neutral-500 underline underline-offset-4 hover:text-black"
                     >
                       Manage addresses
                     </Link>
@@ -717,12 +713,12 @@ export default function CheckoutPage() {
 
                   {/* Saved address selector */}
                   {savedAddresses.length > 0 && (
-                    <div className="mb-4 border border-black/10 bg-white p-3 sm:p-4">
-                      <div className="mb-2 flex items-center justify-between gap-2">
-                        <p className="text-xs font-medium">
+                    <div className="mb-4 border border-black/10 bg-white p-4 sm:p-4">
+                      <div className="mb-3 flex items-center justify-between gap-2">
+                        <p className="text-sm font-medium">
                           Your saved addresses
                         </p>
-                        <span className="text-[10px] text-neutral-400">
+                        <span className="text-xs text-neutral-400">
                           {savedAddresses.length} saved
                         </span>
                       </div>
@@ -732,7 +728,7 @@ export default function CheckoutPage() {
                         onChange={(e) =>
                           handleAddressSelection(e.target.value)
                         }
-                        className="w-full border border-black/15 bg-[#F8F8F6] px-3 py-3 text-sm text-black outline-none focus:border-black"
+                        className="w-full border border-black/15 bg-[#F8F8F6] px-3 py-4 text-base text-black outline-none focus:border-black"
                       >
                         <option value="">Enter a different address</option>
 
@@ -745,19 +741,19 @@ export default function CheckoutPage() {
                         ))}
                       </select>
 
-                      <p className="mt-2 text-[10px] leading-4 text-neutral-500">
+                      <p className="mt-3 text-xs leading-5 text-neutral-500">
                         Select an address to automatically fill your delivery details.
                       </p>
                     </div>
                   )}
 
                   {addressesLoading && (
-                    <p className="mb-3 text-[11px] text-neutral-400">
+                    <p className="mb-3 text-sm text-neutral-400">
                       Checking your saved addresses...
                     </p>
                   )}
 
-                  <div className="grid gap-2.5 sm:gap-3">
+                  <div className="grid gap-3">
                     <input
                       required
                       maxLength={500}
@@ -767,10 +763,10 @@ export default function CheckoutPage() {
                       onChange={(e) =>
                         updateField("address", e.target.value)
                       }
-                      className="w-full border border-black/15 bg-white px-3 py-3.5 text-sm font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black sm:px-4 sm:py-4"
+                      className="w-full border border-black/15 bg-white px-4 py-4 text-base font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black"
                     />
 
-                    <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <input
                         required
                         maxLength={100}
@@ -778,7 +774,7 @@ export default function CheckoutPage() {
                         placeholder="City"
                         value={form.city}
                         onChange={(e) => updateField("city", e.target.value)}
-                        className="w-full min-w-0 border border-black/15 bg-white px-3 py-3.5 text-sm font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black sm:px-4 sm:py-4"
+                        className="w-full min-w-0 border border-black/15 bg-white px-4 py-4 text-base font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black"
                       />
 
                       <input
@@ -788,7 +784,7 @@ export default function CheckoutPage() {
                         placeholder="State"
                         value={form.state}
                         onChange={(e) => updateField("state", e.target.value)}
-                        className="w-full min-w-0 border border-black/15 bg-white px-3 py-3.5 text-sm font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black sm:px-4 sm:py-4"
+                        className="w-full min-w-0 border border-black/15 bg-white px-4 py-4 text-base font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black"
                       />
 
                       <input
@@ -805,7 +801,7 @@ export default function CheckoutPage() {
                             e.target.value.replace(/\D/g, "").slice(0, 6)
                           )
                         }
-                        className="col-span-2 w-full border border-black/15 bg-white px-3 py-3.5 text-sm font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black sm:px-4 sm:py-4"
+                        className="col-span-2 w-full border border-black/15 bg-white px-4 py-4 text-base font-normal text-black outline-none placeholder:text-neutral-400 focus:border-black sm:col-span-1"
                       />
                     </div>
                   </div>
@@ -815,7 +811,7 @@ export default function CheckoutPage() {
                 {error && (
                   <p
                     role="alert"
-                    className="border border-red-200 bg-red-50 p-3 text-xs leading-5 text-red-800 sm:p-4 sm:text-sm"
+                    className="border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-800"
                   >
                     {error}
                   </p>
@@ -824,7 +820,7 @@ export default function CheckoutPage() {
                 {message && (
                   <p
                     role="status"
-                    className="border border-black/10 bg-white p-3 text-xs leading-5 text-neutral-600 sm:p-4 sm:text-sm"
+                    className="border border-black/10 bg-white p-4 text-sm leading-6 text-neutral-600"
                   >
                     {message}
                   </p>
@@ -834,7 +830,7 @@ export default function CheckoutPage() {
                 <button
                   type="submit"
                   disabled={loading || !scriptReady}
-                  className="hidden w-full bg-black px-8 py-4 text-[10px] font-medium uppercase tracking-[0.2em] text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 lg:block"
+                  className="hidden min-h-[56px] w-full bg-black px-8 py-4 text-xs font-medium uppercase tracking-[0.18em] text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 lg:block"
                 >
                   {loading
                     ? "Preparing Secure Checkout..."
@@ -843,7 +839,7 @@ export default function CheckoutPage() {
                       : "Continue to Secure Payment"}
                 </button>
 
-                <p className="text-xs leading-5 text-neutral-500 sm:text-sm">
+                <p className="text-sm leading-6 text-neutral-500">
                   Online payment only. Your order is confirmed after payment verification.
                 </p>
               </form>
@@ -854,23 +850,23 @@ export default function CheckoutPage() {
 
       {/* Mobile sticky payment bar */}
       {items.length > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-[#F8F8F6]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 backdrop-blur-lg lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-[#F8F8F6]/95 px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-4 backdrop-blur-lg lg:hidden">
           <div className="mx-auto flex max-w-6xl items-center justify-between">
             <div>
-              <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-500">
+              <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-neutral-500">
                 Total Amount
               </p>
 
-              <p className="mt-0.5 text-xl font-semibold tracking-tight text-black">
+              <p className="mt-1 text-2xl font-semibold tracking-tight text-black">
                 {formatPrice(subtotal)}
               </p>
             </div>
 
             <div className="text-right">
-              <p className="text-xs text-neutral-500">
+              <p className="text-sm text-neutral-500">
                 {totalItems} items
               </p>
-              <p className="mt-1 text-[10px] uppercase tracking-wider text-neutral-500">
+              <p className="mt-1 text-xs uppercase tracking-wider text-neutral-500">
                 Free Delivery
               </p>
             </div>
@@ -880,7 +876,7 @@ export default function CheckoutPage() {
             type="submit"
             form="checkout-form"
             disabled={loading || !scriptReady}
-            className="mx-auto mt-3 flex h-12 w-full max-w-6xl items-center justify-center bg-black text-[10px] font-medium uppercase tracking-[0.2em] text-white active:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mx-auto mt-4 flex h-14 w-full max-w-6xl items-center justify-center bg-black text-sm font-medium uppercase tracking-[0.12em] text-white active:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading
               ? "Preparing Secure Checkout..."

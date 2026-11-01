@@ -31,8 +31,8 @@ const pearlImages = [
   "/images/pearl2.png",
   "/images/pearl3.png",
   "/images/pearl4.png",
-  "/images/pearl5.png",
-  "/images/pearl6.PNG",
+  
+  
 ];
 
 export default function PearlPage() {

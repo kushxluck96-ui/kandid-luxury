@@ -14,8 +14,8 @@ export default function Hero() {
       <div className="pointer-events-none absolute -right-32 top-10 h-80 w-80 rounded-full bg-white/80 blur-[100px]" />
       <div className="pointer-events-none absolute -left-32 bottom-0 h-72 w-72 rounded-full bg-[#E9DFCC]/40 blur-[100px]" />
 
-      <div className="relative mx-auto max-w-7xl px-5 pb-12 pt-12 sm:px-8 sm:pb-20 sm:pt-20 lg:px-12 lg:pt-24">
-        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+      <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-9 sm:px-8 sm:pb-20 sm:pt-20 lg:px-12 lg:pt-24">
+        <div className="grid items-center gap-7 lg:grid-cols-2 lg:gap-12">
 
           {/* Brand introduction */}
           <motion.div
@@ -25,29 +25,30 @@ export default function Hero() {
             className="order-1 text-center lg:text-left"
           >
             <div className="flex flex-col items-center lg:items-start">
-              <p className="text-[12px] font-medium uppercase tracking-[0.38em] text-[#9B896B] sm:text-[10px]">
+              <p className="text-[13px] font-medium uppercase tracking-[0.3em] text-[#9B896B] sm:text-[10px] sm:tracking-[0.38em]">
                 MINIMAGIC SKINCARE
               </p>
-              <p className="mt-2 text-[10px] uppercase tracking-[0.28em] text-[#8B806D]">
+
+              <p className="mt-2 text-[11px] uppercase tracking-[0.22em] text-[#8B806D] sm:text-[10px] sm:tracking-[0.28em]">
                 by KANDID LUXURY
               </p>
             </div>
 
-            <p className="mt-7 font-serif text-3xl font-light italic text-[#85765F] sm:text-4xl">
+            <p className="mt-6 font-serif text-3xl font-light italic text-[#85765F] sm:mt-7 sm:text-4xl">
               Little Magic.
             </p>
 
-            <h1 className="mt-1 font-serif text-[46px] font-normal leading-[1.05] tracking-tight text-[#29271F] sm:text-6xl lg:text-7xl">
+            <h1 className="mt-1 font-serif text-[54px] font-normal leading-[1.02] tracking-tight text-[#29271F] sm:text-6xl lg:text-7xl">
               Beautiful
               <br />
               Skin.
             </h1>
 
-            <p className="mt-3 font-serif text-2xl font-light italic text-[#85765F] sm:text-3xl">
+            <p className="mt-3 font-serif text-[27px] font-light italic text-[#85765F] sm:text-3xl">
               Everyday Confidence.
             </p>
 
-            <p className="mx-auto mt-5 max-w-sm text-[13px] leading-6 text-[#777166] sm:text-sm sm:leading-7 lg:mx-0">
+            <p className="mx-auto mt-5 max-w-sm text-[15px] leading-7 text-[#777166] sm:text-sm sm:leading-7 lg:mx-0">
               Discover a little magic in your everyday skincare ritual.
               Thoughtful skincare, made to make every moment feel special.
             </p>
@@ -55,17 +56,17 @@ export default function Hero() {
             <div className="mt-7 flex justify-center lg:justify-start">
               <Link
                 href="/shop"
-                className="group inline-flex min-h-12 items-center justify-center gap-4 rounded-full bg-[#29271F] px-7 text-[10px] font-medium uppercase tracking-[0.2em] text-white transition duration-300 hover:bg-[#494437]"
+                className="group inline-flex min-h-[54px] items-center justify-center gap-4 rounded-full bg-[#29271F] px-8 text-[11px] font-medium uppercase tracking-[0.18em] text-white transition duration-300 hover:bg-[#494437] sm:min-h-12 sm:px-7 sm:text-[10px]"
               >
                 Explore Collection
                 <ArrowRight
-                  size={15}
+                  size={17}
                   className="transition-transform duration-300 group-hover:translate-x-1"
                 />
               </Link>
             </div>
 
-            <p className="mt-7 text-[9px] uppercase tracking-[0.3em] text-[#A69B88]">
+            <p className="mt-6 text-[10px] leading-5 uppercase tracking-[0.22em] text-[#A69B88] sm:mt-7 sm:text-[9px] sm:tracking-[0.3em]">
               A BEAUTY EXPERIENCE BY KANDID LUXURY
             </p>
           </motion.div>
@@ -81,7 +82,7 @@ export default function Hero() {
             <div className="absolute left-1/2 top-1/2 h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80 blur-[70px] sm:h-[390px] sm:w-[390px]" />
 
             {/* Equal-height product display area */}
-            <div className="relative grid min-h-[270px] grid-cols-2 items-center gap-2 sm:min-h-[410px] sm:gap-5">
+            <div className="relative grid min-h-[260px] grid-cols-2 items-center gap-2 sm:min-h-[410px] sm:gap-5">
 
               {/* Pearl Powder */}
               <motion.div
@@ -137,31 +138,33 @@ export default function Hero() {
               </motion.div>
             </div>
 
-            {/* Clickable product names and Discover links */}
-            <div className="relative mt-1 flex items-center justify-center gap-5 text-center">
+            {/* Product names and Discover links */}
+            <div className="relative mt-2 flex items-center justify-center gap-4 text-center sm:gap-5">
               <Link
                 href="/pearl"
-                className="group rounded-md px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-[#9B896B]"
+                className="group rounded-md px-2 py-2 outline-none focus-visible:ring-2 focus-visible:ring-[#9B896B]"
               >
-                <p className="text-[9px] font-medium uppercase tracking-[0.18em] text-[#766D5D] transition-colors group-hover:text-black">
+                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#766D5D] transition-colors group-hover:text-black sm:text-[9px] sm:tracking-[0.18em]">
                   Pearl Powder
                 </p>
-                <p className="mt-1 inline-flex items-center gap-1 text-[8px] uppercase tracking-[0.16em] text-[#AAA08F] transition-colors group-hover:text-[#766D5D]">
-                  Discover <ArrowRight size={10} />
+
+                <p className="mt-1.5 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-[#96866B] transition-colors group-hover:text-[#766D5D] sm:text-[8px] sm:tracking-[0.16em]">
+                  Discover <ArrowRight size={12} />
                 </p>
               </Link>
 
-              <div className="h-7 w-px bg-[#D9D1C3]" />
+              <div className="h-8 w-px bg-[#D9D1C3]" />
 
               <Link
                 href="/revive"
-                className="group rounded-md px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-[#9B896B]"
+                className="group rounded-md px-2 py-2 outline-none focus-visible:ring-2 focus-visible:ring-[#9B896B]"
               >
-                <p className="text-[9px] font-medium uppercase tracking-[0.18em] text-[#766D5D] transition-colors group-hover:text-black">
+                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#766D5D] transition-colors group-hover:text-black sm:text-[9px] sm:tracking-[0.18em]">
                   Revive Face Pack
                 </p>
-                <p className="mt-1 inline-flex items-center gap-1 text-[8px] uppercase tracking-[0.16em] text-[#AAA08F] transition-colors group-hover:text-[#766D5D]">
-                  Discover <ArrowRight size={10} />
+
+                <p className="mt-1.5 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-[#96866B] transition-colors group-hover:text-[#766D5D] sm:text-[8px] sm:tracking-[0.16em]">
+                  Discover <ArrowRight size={12} />
                 </p>
               </Link>
             </div>
@@ -169,8 +172,8 @@ export default function Hero() {
         </div>
 
         {/* Bottom brand detail */}
-        <div className="mt-12 border-t border-[#DED8CC] pt-5 sm:mt-16">
-          <p className="text-center font-serif text-sm italic text-[#96866B] sm:text-base">
+        <div className="mt-10 border-t border-[#DED8CC] pt-5 sm:mt-16">
+          <p className="text-center font-serif text-base italic text-[#96866B] sm:text-base">
             Let the Magic Begin.
           </p>
         </div>

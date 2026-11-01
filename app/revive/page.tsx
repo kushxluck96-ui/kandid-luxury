@@ -27,8 +27,8 @@ const reviveImages = [
   "/images/revive2.png",
   "/images/revive3.png",
   "/images/revive4.png",
-  "/images/revive5.png",
-  "/images/revive6.PNG",
+  
+  
 ];
 
 export default function RevivePage() {
@@ -242,7 +242,7 @@ export default function RevivePage() {
                 </div>
 
                 <p className="mt-2 text-[8px] uppercase tracking-[0.25em] text-neutral-400">
-                  Select a photo · {reviveImages.indexOf(selectedImage) + 1} / 7
+                  Select a photo · {reviveImages.indexOf(selectedImage) + 1} / {reviveImages.length}
                 </p>
               </div>
 
