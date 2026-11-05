@@ -4,9 +4,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowRight, Minus, Plus, ShoppingBag } from "lucide-react";
+import {
+  ArrowRight,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Sparkles,
+} from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useCart } from "@/components/CartProvider";
+import DiwaliDecorations from "@/components/DiwaliDecorations";
 
 type Product = {
   id: string;
@@ -106,8 +113,27 @@ export default function ShopPage() {
       maximumFractionDigits: 0,
     }).format(value);
 
+  // Fallback original prices for the two Diwali sale products.
+  function getOriginalPrice(product: Product) {
+    if (product.original_price != null) {
+      return Number(product.original_price);
+    }
+
+    if (product.slug === "revive-anti-aging-botox-face-pack") {
+      return 3500;
+    }
+
+    if (product.slug === "pure-pearl-powder") {
+      return 2600;
+    }
+
+    return Number(product.price);
+  }
+
   return (
-    <main className="min-h-screen bg-[#F7F6F2] text-[#28251F]">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#F7F6F2] text-[#28251F]">
+      {/* Diwali lights and fireworks */}
+      <DiwaliDecorations />
 
       {/* HEADER */}
       <header className="sticky top-0 z-40 border-b border-black/10 bg-[#F8F7F3]/95 backdrop-blur-md">
@@ -146,6 +172,38 @@ export default function ShopPage() {
         </span>
       </section>
 
+      {/* DIWALI SALE BANNER */}
+      <section className="mx-auto max-w-7xl px-3 pb-7 sm:px-8">
+        <div className="relative overflow-hidden border border-[#D9C49B] bg-gradient-to-r from-[#34251D] via-[#573B28] to-[#34251D] px-5 py-7 text-center text-[#F9E9C4] sm:py-9">
+          <div className="absolute left-5 top-4 text-[#E8C77D]/60">
+            <Sparkles size={19} />
+          </div>
+
+          <div className="absolute bottom-4 right-5 text-[#E8C77D]/60">
+            <Sparkles size={19} />
+          </div>
+
+          <p className="text-[10px] font-medium uppercase tracking-[0.35em] text-[#E8C77D] sm:text-xs">
+            A Season of Light & Beauty
+          </p>
+
+          <h2 className="mt-2 font-serif text-3xl font-light tracking-wide sm:text-4xl">
+            Diwali Celebration Sale
+          </h2>
+
+          <p className="mx-auto mt-3 max-w-xl text-xs leading-6 text-[#F2E4CB]/85 sm:text-sm">
+            Celebrate the festive season with special prices on your
+            MiniMagic skincare favourites.
+          </p>
+
+          <div className="mt-4 inline-flex items-center gap-2 border border-[#E8C77D]/60 px-4 py-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[#F9E9C4] sm:text-xs">
+            <Sparkles size={14} />
+            Limited Festive Offers
+            <Sparkles size={14} />
+          </div>
+        </div>
+      </section>
+
       {/* PRODUCTS */}
       <section className="mx-auto max-w-7xl px-3 pb-12 sm:px-8">
         {loading ? (
@@ -174,6 +232,18 @@ export default function ShopPage() {
                   ? "/revive"
                   : "/pearl";
 
+              const originalPrice = getOriginalPrice(product);
+              const currentPrice = Number(product.price);
+              const hasSale = originalPrice > currentPrice;
+
+              const savings = hasSale
+                ? originalPrice - currentPrice
+                : 0;
+
+              const discount = hasSale
+                ? Math.round((savings / originalPrice) * 100)
+                : 0;
+
               return (
                 <article
                   key={product.id}
@@ -196,11 +266,24 @@ export default function ShopPage() {
                         />
                       </div>
 
+                      {/* AVAILABILITY */}
                       <span className="absolute left-2 top-2 bg-white/90 px-2 py-1.5 text-[10px] font-medium uppercase tracking-wide text-[#827B70] sm:text-[8px]">
                         {product.stock_quantity > 0
                           ? "Available"
                           : "Sold out"}
                       </span>
+
+                      {/* DIWALI SALE BADGE */}
+                      {hasSale && (
+                        <div className="absolute right-2 top-2 bg-[#8D3026] px-2.5 py-2 text-center text-white shadow-md">
+                          <p className="text-[9px] font-semibold uppercase tracking-wider sm:text-[10px]">
+                            Diwali Sale
+                          </p>
+                          <p className="mt-0.5 text-[11px] font-bold sm:text-xs">
+                            {discount}% OFF
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </Link>
 
@@ -214,18 +297,22 @@ export default function ShopPage() {
 
                     {/* PRICE */}
                     <div className="mt-2 flex flex-wrap items-baseline gap-1.5 sm:gap-2">
-                      <span className="text-[16px] font-semibold sm:text-sm">
-                        {money(Number(product.price))}
+                      <span className="text-[16px] font-semibold text-[#8D3026] sm:text-sm">
+                        {money(currentPrice)}
                       </span>
 
-                      {product.original_price != null &&
-                        Number(product.original_price) >
-                          Number(product.price) && (
-                          <span className="text-[11px] text-[#928B80] line-through sm:text-[10px]">
-                            {money(Number(product.original_price))}
-                          </span>
-                        )}
+                      {hasSale && (
+                        <span className="text-[11px] text-[#928B80] line-through sm:text-[10px]">
+                          {money(originalPrice)}
+                        </span>
+                      )}
                     </div>
+
+                    {hasSale && (
+                      <p className="mt-1 text-[11px] font-medium text-[#8D3026] sm:text-[10px]">
+                        You save {money(savings)}
+                      </p>
+                    )}
 
                     {product.weight && (
                       <p className="mt-2 text-[12px] text-[#827B70] sm:text-[10px]">
